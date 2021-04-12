@@ -1,0 +1,1157 @@
+---
+title: "226305 PV WS20-21"
+subtitle: "Ruegen-Ranger finale Erhebung"
+author: "Maren Krämer, mk341@hdm-stuttgart.de"
+date: '`r format(Sys.Date(), "%d. %B %Y")`'
+output:  
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_depth: 3
+    number_sections: yes
+  word_document:
+    toc: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+## Unsere Links:
+
+GitHub: <https://github.com/Artsky0/Ruegen-Ranger/tree/main/The%20Main%20Thing>
+
+Codebuch: <https://github.com/Artsky0/Ruegen-Ranger/blob/main/The%20Main%20Thing/Codebuch.md>
+
+```{r Netzwerk einlesen, echo=FALSE, fig.height=9, fig.width=16, message=FALSE, warning=TRUE, paged.print=TRUE}
+
+library(tidyverse)
+library(igraph)
+# Erstellt das Netzwerk aus ihren Edge- und Nodelists. Anzeige des Texts in utf-8
+
+options(encoding="utf-8")
+
+# Einlesen der Edge- und Nodelist aus Github
+elfinal <- read.csv("https://raw.githubusercontent.com/Artsky0/Ruegen-Ranger/main/The%20Main%20Thing/Finale_Edgelist_R%C3%BCgen-Ranger.csv", header=T, as.is=T, sep = ",")
+nodesfinal <- read.csv("https://raw.githubusercontent.com/Artsky0/Ruegen-Ranger/main/The%20Main%20Thing/Finale_Nodelist_R%C3%BCgen-Ranger.csv", header=T, as.is=T, sep = ",")
+
+# Matrix erstellen
+edgematrix <-as.matrix(elfinal)
+
+par(mar=c(0,0,0,0))
+
+# Zusammenführen von Edge- und Nodelist als igraph-Objekt
+ 
+RRFinal_u <- graph_from_data_frame(d=edgematrix, vertices=nodesfinal, directed=FALSE)
+RRFinal_d <- graph_from_data_frame(d=edgematrix, vertices=nodesfinal, directed=TRUE)
+
+# Grundattribute für alle Netzwerke
+
+V(RRFinal_u)$frame.color <- "NA"
+V(RRFinal_d)$frame.color <- "NA"
+V(RRFinal_u)[V(RRFinal_u)$type == 0]$shape <- "square"
+V(RRFinal_u)[V(RRFinal_u)$type == 1]$shape <- "circle"
+V(RRFinal_d)[V(RRFinal_d)$type == 0]$shape <- "square"
+V(RRFinal_d)[V(RRFinal_d)$type == 1]$shape <- "circle"
+E(RRFinal_d)$arrow.size <- 0.1
+
+```
+
+# Gesamtnetzwerke (NOCH NICHT IMPLEMENTIERT)
+Das Netzwerk scheint sehr unübersichtlich zu sein. Die Namen sind kaum zu lesen, die Knoten stehen zu eng beieinander und man erkennt nicht genau, ob es sich um eine Ziffer oder ein Medienhaus handelt. Deshalb ist es sinnvoll, dass Netzwerk vereinfacht darzustellen. Um die Unterscheidung zwischen Ziffer und Medienhaus in unserem two-mode Netzwerk zu verdeutlichen, haben wir den Ziffern eine rechteckige Visualisierung zugewiesen. Die Knoten der Medienhäuser sind wiederum als Kreise dargestellt. Zusätzlich haben wir das Netzwerk zur besseren Visualisierung mit dem layout_nicely verschönert.
+
+Die Dichte im Netzwerk beträgt xx Prozent von allen möglichen Verbindungen. Die maximale Pfaddistanz beträgt xx Schritte.
+
+
+## Erste Darstellung des Gesamtnetzwerks
+
+```{r Gesamtnetzwerk und Anpassungen (unübersichtlich)}
+
+RRFinal_u
+
+# simple Visualisierung, um das Netzwerk zu überprüfen
+
+plot(RRFinal_u,
+     asp=0,
+     layout=layout_nicely,
+     main="Gesamtnetzwerk")
+
+plot(RRFinal_d,
+     asp=0,
+     layout=layout_nicely,
+     main="Gesamtnetzwerk")
+```
+
+## Gesamtnetzwerk nach gerügten Online- und Offline-Publikationen (NOCH NICHT IMPLEMENTIERT)
+Wir haben das Gesamtnetzwerk in Online- und Offline-Publikationen unterteilt. Hierfür wurden die online-Artikel blau eingefärbt und die offline-Artikel rosa.
+Dabei wird sichtbar, dass der größere Teil der gerügten Artikel offline war. Das lässt sich dadurch erklären, dass das wenige Artikel online veröffentlicht wurden, bzw weniger medien eine Onlinepräsenz hatten.
+Die online gerügten Artikel nehmen mit der Zeit zu.
+
+
+```{r online und offline gerügte Publikationen, fig.height=9, fig.width=16}
+
+# Einfärben der online- (blau) und offline-(rosa) veröffentlichten Artikeln 
+
+V(RRFinal_u)[V(RRFinal_u)$published==3]$color <- "grey80"
+V(RRFinal_u)[V(RRFinal_u)$published==0]$color <- "steelblue"
+V(RRFinal_u)[V(RRFinal_u)$published==1]$color <- "rosybrown1"
+
+plot(RRFinal_u,
+   layout=layout_nicely,
+    main="gerügte Online- und Offline-Publikationen")
+     
+```
+
+## Gesamtnetzwerk nach regionalen und überregionalen gerügten Medien (NOCH NICHT IMPLEMENTIERT)
+Wir wollten die Anzahl der regionalen und überregionalen Medien veranschaulichen. Dafür färbten wir die regionalen Medien lila eingefärbt und die überregionalen grau. Auf dem ersten Blick sehen die Medien ausgeglichen aus. Nach einer genauen Berechnung gibt es insgesamt etwas mehr regionale (=172) als überregionale (=158) Medien. 
+
+
+```{r regionale und überregionale Medien, fig.height=9, fig.width=16}
+
+# Einfärben der reginalen (lila) und überregionalen (grau) Medien 
+
+V(RRFinal_u)[V(RRFinal_u)$region==3]$color <- "grey80"
+V(RRFinal_u)[V(RRFinal_u)$region==0]$color <- "azure4"
+V(RRFinal_u)[V(RRFinal_u)$region==1]$color <- "mediumorchid2"
+
+plot(RRFinal_u,
+   layout=layout_nicely,
+    main="regionale vs. überregionale Medien")
+     
+```
+
+## Simple Datenerhebung
+Das Netzwerk hat einen Dichte von 969. Außerdem wollten wir wissen, welche Ziffer den höchsten Degree-Wert hat. Als Ergebnis erhielten wir Ziffer 8 mit insgesamt 298 möglichen Verbindungen. Ziffer 7 hat mit 188 Verbindungen den zweithöchsten Degree-Wert im gesamten Netzwerk. Den dritthöchsten Degree-Wert hat Ziffer 2 mit 155 möglichen Verbindungen. 
+
+
+```{r Zahlen zu Degrees, Edges usw., fig.height=9, fig.width=16}
+
+# Degreeberechnung und -anzeige
+
+degreeRR <- degree(RRFinal_d, mode="all")
+
+degreeRR
+
+which.max(degreeRR)
+sort.default(degreeRR, decreasing = TRUE)
+ecount(RRFinal_u)
+
+```
+
+## Teilnetzwerk 1: Ego-Netzwerk aus dem Knoten mit der höchsten Dichte
+Wir wollten die Ziffer 8 näher betrachten, da sie den höchsten Degree-Wert hat. Zudem wollten wir die "Bild" hervorheben, da sie die meisten Rügen bekommen und damit die meisten Kontakte hat. Zur Veranschaulichung haben wir ein Ego-Netzwerk von Ziffer 8 erstellt und alle regionalen Bildpublikationen in der Farbe “salmon” eingefärbt. Aus diesem Ego-Netzwerk haben wir zum Einen die Zentralitätsmaße berechnet. Zum anderen haben wir die normalisierten prozentualen Werte der Beziehungen ausgerechnet. Dieser beträgt 2.61 Prozent. Insgesamt gibt es 12656 mögliche Beziehungen zwischen den Knoten. Denselben Vorgang haben wir ohne Einzeltäter wiederholt. Daraus ergab sich 6,74 Prozent und 930 mögliche Beziehungen. Für eine bessere Übersicht wählten wir das Layout layout_as_star. In der ersten Darstellung bezogen wir die Degree-Werte ein. DIe Knoten mit den höchsten Degree-Werten sind hier farbig und größer dargestellt, je nach ihrem Degree-Wert.
+
+```{r Teilnetzwerk zu Ziffer 8, Bild ist rot eingefärbt, fig.height=9, fig.width=16}
+
+# Höchsten Degree-Wert ermitteln
+
+which.max(degreeRR)
+
+# Erstellung des Egonetzwerks
+
+ego8 <- make_ego_graph(RRFinal_u, order = 1, nodes = V(RRFinal_u)$name == "Pressekodex Ziffer 8", mode="all")
+egoz8 <- ego8[[1]]
+
+# Farbgebung
+
+V(egoz8)[V(egoz8)]$color <- "gray80"
+V(egoz8)[V(egoz8)$label == "BildA"]$color <- "salmon"
+V(egoz8)[V(egoz8)$label == "BildO"]$color <- "salmon"
+V(egoz8)[V(egoz8)$label == "Bild"]$color <- "salmon"
+V(egoz8)[V(egoz8)$label == "BildN"]$color <- "salmon"
+V(egoz8)[V(egoz8)$label == "BildM"]$color <- "salmon"
+V(egoz8)[V(egoz8)$label == "BildMW"]$color <- "salmon"
+V(egoz8)[V(egoz8)$label == "BildBR"]$color <- "salmon"
+V(egoz8)[V(egoz8)$label == "BildD"]$color <- "salmon"
+V(egoz8)[V(egoz8)$label == "BildH"]$color <- "salmon"
+V(egoz8)[V(egoz8)$label == "BildHA"]$color <- "salmon"
+V(egoz8)[V(egoz8)$label == "BildK"]$color <- "salmon"
+V(egoz8)[V(egoz8)$label == "BildS"]$color <- "salmon"
+V(egoz8)[V(egoz8)$label == "BildA"]$color <- "salmon"
+V(egoz8)[V(egoz8)$label == "BildaS"]$color <- "salmon"
+V(egoz8)[V(egoz8)$label == "BildDE"]$color <- "salmon"
+V(egoz8)[V(egoz8)$label == "BildF"]$color <- "salmon"
+E(egoz8)[E(egoz8)$weight == 1]$color <- "gray50"
+E(egoz8)[E(egoz8)$weight == 2]$color <- "lightblue"
+E(egoz8)[E(egoz8)]$width <- 4
+
+# Degreeberechnung
+
+centr_degree(egoz8, mode="all", normalized=T)
+inds <- degree(egoz8, mode="in")
+
+plot(egoz8,
+     asp=0,
+     layout=layout_as_star,
+     vertex.size=inds,
+     main="Ego-Netzwerk1")
+
+# Einzeltäter rauslöschen
+
+degree(egoz8) 
+
+egoz8_2 <- delete.vertices(egoz8, degree(egoz8)<=1)
+
+centr_degree(egoz8_2, mode="all", normalized=T)
+inds <- degree(egoz8_2, mode="in")
+
+# Darstellung mit Einbeziehen der Degreewerte
+
+plot(egoz8_2,
+     asp=0,
+     layout=layout_as_star,
+     vertex.size=inds/3)
+
+# Darstellung ohne Einbeziehen der Degreewerte
+
+plot(egoz8_2,
+     asp=0,
+     layout=layout_as_star)
+```
+
+### Teilnetzwerk 1 verfeinern
+Danach stellen wir das Ego-Netzwerk dar, ohne die Degree-Werte einzubeziehen. Hier färbten wir alle Bildpiblikationen in der Farbe salmon ein. In diesem Netzwerk wird die Degree-wert durch die Menge der Kanten sichtbar. Außerdem haben wir die öffentlichen und nicht-öffentliche Rügen farblich unterschieden. Die grauen Kanten stellen die öffentlichen Rügen dar, die hellblauen die nicht-öffentlichen. Dadurch wird sichtbar, dass mehr Rügen öffentlich stattfanden.
+
+
+```{r Teilnetzwerk zu Ziffer 8 (2), fig.height=9, fig.width=16}
+degree(egoz8) 
+
+egoz8_2 <- delete.vertices(egoz8, degree(egoz8)<=1)
+
+centr_degree(egoz8_2, mode="all", normalized=T)
+inds <- degree(egoz8_2, mode="in")
+
+plot(egoz8_2,
+     asp=0,
+     layout=layout_as_star,
+     vertex.size=inds/3)
+
+plot(egoz8_2,
+     asp=0,
+     layout=layout_as_star)
+```
+
+## Teilnetzwerk 2: Historische Sortierung
+Um den Verlauf in den Jahren darzustellen, erstellten wir Teilnetzwerke in vier-Jahres-Abschnitten. Gesamt betrachtet fällt auf, dass die Ziffer 7 immer ihr eigene Clique bildet, also wenig bis überhaupt nicht mit dem restlichen Netzwerk verbunden ist. Mit den Jahren haben sich die Rügen gegen Ziffer 7 vermehrt. In den Jahren 2005-2009 wurde besonders häufig gegen die Ziffer 7 gerügt. 
+
+
+```{r Teilnetzwerke Jahre 1990-2019, fig.height=9, fig.width=16}
+
+#Gleichzeitige Darstellung
+
+par(mfrow=c(2,3),mar=c(1,1,1,1))
+
+# Einfärben
+
+V(RRFinal_u)[V(RRFinal_u)$type==0]$color <- "lavenderblush4"
+V(RRFinal_u)[V(RRFinal_u)$type==1]$color <- "plum2"
+
+# Bereich 1990 - 1994
+
+b1 <- delete.edges(RRFinal_u, E(RRFinal_u)[year >"1994"])
+RRyear1 <- delete.vertices(b1, degree(b1)==0)
+
+RRyear1
+
+plot(RRyear1,
+     asp=0,
+     layout=layout_nicely,
+     edge.curved=.2,
+     edge.curved=curve_multiple(RRyear1),
+     main="Zeitraum 1990 - 1994")
+
+# Bereich 1995 - 1999
+
+b2 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <"1995"])
+b2a <- delete.edges(b2, E(b2)[year >"1999"])
+RRyear2 <- delete.vertices(b2a, degree(b2a)==0)
+
+RRyear2
+
+plot(RRyear2,
+     asp=0,
+     layout=layout_nicely,
+     edge.curved=.2,
+     edge.curved=curve_multiple(RRyear2),
+     main="Zeitraum 1995 - 1999")
+
+# Bereich 2000 - 2004
+
+b3 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <"2000"])
+b3a <- delete.edges(b3, E(b3)[year >"2004"])
+RRyear3 <- delete.vertices(b3a, degree(b3a)==0)
+
+RRyear3
+
+plot(RRyear3,
+     asp=0,
+     layout=layout_nicely,
+     edge.curved=.2,
+     edge.curved=curve_multiple(RRyear3),
+     main="Zeitraum 2000 - 2004")
+
+# Bereich 2005 - 2009
+
+b4 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <"2005"])
+b4a <- delete.edges(b4, E(b4)[year >"2009"])
+RRyear4 <- delete.vertices(b4a, degree(b4a)==0)
+
+RRyear4
+
+plot(RRyear4,
+     asp=0,
+     layout=layout_nicely,
+     edge.curved=.2,
+     edge.curved=curve_multiple(RRyear4),
+     main="Zeitraum 2005 - 2009")
+
+# Bereich 2010 - 2014
+
+b5 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <"2010"])
+b5a <- delete.edges(b5, E(b5)[year >"2014"])
+RRyear5 <- delete.vertices(b5a, degree(b5a)==0)
+
+RRyear5
+
+plot(RRyear5,
+     asp=0,
+     layout=layout_nicely,
+     edge.curved=.2,
+     edge.curved=curve_multiple(RRyear5),
+     main="Zeitraum 2010 - 2014")
+
+# Bereich 2015 - 2019
+
+b6 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <"1995"])
+b6a <- delete.edges(b6, E(b6)[year >"1999"])
+RRyear6 <- delete.vertices(b6a, degree(b6a)==0)
+
+RRyear6
+
+plot(RRyear6,
+     asp=0,
+     layout=layout_nicely,
+     edge.curved=.2,
+     edge.curved=curve_multiple(RRyear6),
+     main="Zeitraum 2015 - 2019")
+
+```
+
+## Clusterung der historischen Teilnetzwerke mit Walktrap-Algorithmus
+Im Jahresvergleich werden einzelne Cliquen deutlich, die sich daraus ergeben, dass häufig gegen eine bestimmte Ziffer gerügt wurden. Um hier durchzublicken, haben wir das mehrfarbige Walktrap-Alogorithmus auf unsere Teilnetzwerke angewendet. Hier wird besonders deutlich, dass im Jahr 2005-2009 am häufigsten gegen die Ziffer 7 gerügt wurde und sich damit eine große Clique gebildet hat.
+
+Im Zeitraum 2010-2014 sind weniger Cluster vorhanden. Während in diesem Teilnetzwerk nur fünf Cluster zu sehen sind, sind in den übrigen ca. neun zu sehen. Darauf lässt sich schließen, dass in diesem Zeitraum Publikationen gegen mehrere Ziffern verstoßen haben.
+
+Im Zeitraum 2000-2009 liegen die Cluster übereinander und lassen sich kaum differenzieren. Das erklärt sich daraus, dass die Medien in diesen Jahren gegen mehrere Ziffern gleichzeitig verstoßen haben. 
+
+```{r Teilnetzwerke Jahre 1990-2019, geclustert, fig.height=9, fig.width=16}
+
+#Gleichzeitige Darstellung
+
+par(mfrow=c(2,3),mar=c(1,1,1,1))
+
+# Bereich 1990 - 1994
+
+RRyear1c <- cluster_walktrap(RRyear1)
+modularity(RRyear1c)
+membership(RRyear1c)
+
+plot(RRyear1c, RRyear1,
+     layout=layout_nicely,
+     edge.curved=.2,
+     edge.curved=curve_multiple(RRyear1),
+     main="Zeitraum 1990 - 1994")
+
+# Bereich 1995 - 1999
+
+RRyear2c <- cluster_walktrap(RRyear2)
+modularity(RRyear2c)
+membership(RRyear2c)
+
+plot(RRyear2c, RRyear2,
+     layout=layout_nicely,
+     edge.curved=.2,
+     edge.curved=curve_multiple(RRyear2),
+     main="Zeitraum 1995 - 1999")
+
+# Bereich 2000 - 2004
+
+RRyear3c <- cluster_walktrap(RRyear3)
+modularity(RRyear3c)
+membership(RRyear3c)
+
+plot(RRyear3c, RRyear3,
+     layout=layout_nicely,
+     edge.curved=.2,
+     edge.curved=curve_multiple(RRyear3),
+     main="Zeitraum 2000 - 2004")
+
+# Bereich 2005 - 2009
+
+RRyear4c <- cluster_walktrap(RRyear4)
+modularity(RRyear4c)
+membership(RRyear4c)
+
+plot(RRyear4c, RRyear4,
+     layout=layout_nicely,
+     edge.curved=.2,
+     edge.curved=curve_multiple(RRyear4),
+     main="Zeitraum 2005 - 2009")
+
+# Bereich 2010 - 2014
+
+RRyear5c <- cluster_walktrap(RRyear5)
+modularity(RRyear5c)
+membership(RRyear5c)
+
+plot(RRyear5c, RRyear5,
+     layout=layout_nicely,
+     edge.curved=.2,
+     edge.curved=curve_multiple(RRyear5),
+     main="Zeitraum 2010 - 2014")
+
+# Bereich 2015 - 2019
+
+RRyear6c <- cluster_walktrap(RRyear6)
+modularity(RRyear6c)
+membership(RRyear6c)
+
+plot(RRyear6c, RRyear6,
+     layout=layout_nicely,
+     edge.curved=.2,
+     edge.curved=curve_multiple(RRyear1),
+     main="Zeitraum 2015 - 2019")
+
+```
+
+# Teilnetzwerk 3: Ziffern im Überblick (NOCH NICHT IMPLEMENTIERT)
+Wir wollten herausfinden, ob es einen Zusammenhang zwischen den verschiedenen Ziffern gibt, gegen die verstoßen wurde. Welche Medien stellen sich als Mehrfachtäter heraus, die oft vom Presserat für unterschiedliche Ziffern gerügt wurden. Dafür erstellten wir ein Egonetzwerk der Ziffer 8, in dem wir durch “order=2” auch alle indirekten Beziehungen mit einbeziehen konnten. Zur besseren Darstellung wurden alle Einzeltäter herausgelöscht. In der Darstellung fällt auf, dass besonders Ziffer 13 viele gemeinsame Kanten mit der Ziffer 8 aufweist. Das bedeutet dass oft gleichzeitig gegen beide Ziffern verstoßen wurde. Außerdem fällt auf, dass Bild und Bild Online nahe bei den Ziffern 8 und 13 liegen und sehr viele Kanten zu ihnen ausweist. Außerdem liegen Ziffer 1, 2 und 11 im engeren umkreis von der Ziffer 8. Die Ziffer 3 liegt am weitesten außerhalb des Ego-Netzwerks, sie ist nur durch zwei Kanten (Münchner Merkur und Volksstimme Magdeburg) verbunden.
+Da die Ziffer 8 oft in den Jahren 1990 bis 1994 und 1995 bis 1999 gerügt wurde, haben wir sie zur Übersicht nach Jahren unterteilt und dargestellt.
+
+
+```{r, fig.height=9, fig.width=16}
+
+# Aufgabe: Gibt es einen Zusammenhang zwischen versch. Ziffern, gegen die (gleichzeitig) verstoßen wurde? Ego-Netzwerk einer Ziffer mit order 2 
+
+# Ziffer 8 als meist gerügte Ziffer
+
+ego8 <- make_ego_graph(RRFinal_u, order = 2, nodes = V(RRFinal_u)$name == "Pressekodex Ziffer 8", mode="all")
+egoz8 <- ego8[[1]]
+
+plot(egoz8,
+     asp=0,
+     vertex.size=2,
+     main="Ego-Netzwerk1")
+
+# Einzeltäter rauslöschen
+
+egoz8_2 <- delete.vertices(egoz8, degree(egoz8)<=1)
+
+plot(egoz8_2,
+     asp=0,
+     vertex.size=4,
+     layout = layout_nicely(egoz8_2))
+```
+Neuer Chunk damit man alle nebeneinander darstellen kann
+```{r, fig.height=9, fig.width=16}
+
+# Idee: hier noch mal in die einzelnen Abschnitt unterteilen für Übersichtlichkeit
+par(mfrow=c(2,3),mar=c(1,1,1,1))
+
+#bspw für 1990 bis 1994 also RRyear1
+
+ego8year1 <- make_ego_graph(RRyear1, order = 2, nodes = V(RRFinal_u)$name == "Pressekodex Ziffer 8", mode="all")
+ego8year1 <- ego8year1[[1]]
+
+plot(ego8year1,
+     asp=0,
+     vertex.size=10,
+     main="Ego-Netzwerk Ziffer 8 - 1990 bis 1994")
+
+# 1995 bis 1999 also RRyear2
+
+ego8year2 <- make_ego_graph(RRyear2, order = 2, nodes = V(RRFinal_u)$name == "Pressekodex Ziffer 8", mode="all")
+ego8year2 <- ego8year2[[1]]
+
+plot(ego8year2,
+     asp=0,
+     vertex.size=2,
+     main="Ego-Netzwerk Ziffer 8 - 1995 bis 1999")
+
+# 2000 bis 2004 also RRyear3
+
+ego8year3 <- make_ego_graph(RRyear3, order = 2, nodes = V(RRFinal_u)$name == "Pressekodex Ziffer 8", mode="all")
+ego8year3 <- ego8year3[[1]]
+
+plot(ego8year3,
+     asp=0,
+     vertex.size=2,
+     main="Ego-Netzwerk Ziffer 8 - 2000 bis 2004")
+
+# 2005 bis 2009 also RRyear4
+
+ego8year4 <- make_ego_graph(RRyear4, order = 2, nodes = V(RRFinal_u)$name == "Pressekodex Ziffer 8", mode="all")
+ego8year4 <- ego8year4[[1]]
+
+plot(ego8year4,
+     asp=0,
+     vertex.size=2,
+     main="Ego-Netzwerk Ziffer 8 - 2005 bis 2009")
+
+# 2010 bis 2014 also RRyear5
+
+ego8year5 <- make_ego_graph(RRyear5, order = 2, nodes = V(RRFinal_u)$name == "Pressekodex Ziffer 8", mode="all")
+ego8year5 <- ego8year5[[1]]
+
+plot(ego8year5,
+     asp=0,
+     vertex.size=2,
+     main="Ego-Netzwerk Ziffer 8 - 2010 bis 2014")
+
+# 2015 bis 2019 also RRyear6
+
+ego8year6 <- make_ego_graph(RRyear6, order = 2, nodes = V(RRFinal_u)$name == "Pressekodex Ziffer 8", mode="all")
+ego8year6 <- ego8year6[[1]]
+
+plot(ego8year6,
+     asp=0,
+     vertex.size=2,
+     main="Ego-Netzwerk Ziffer 8 - 2015 bis 2019")
+```
+
+```{r, fig.height=9, fig.width=16}
+
+# Ziffer 7 als zweitmeist gerügte Ziffer (Degree-Wert 188)
+
+
+
+
+sort.default(degreeRR, decreasing = TRUE)
+
+ego7 <- make_ego_graph(RRFinal_u, order = 2, nodes = V(RRFinal_u)$name == "Pressekodex Ziffer 7", mode="all")
+ego7 <- ego7[[1]]
+
+plot(ego7,
+     asp=0,
+     vertex.size=2,
+     main="Ego-Netzwerk1")
+
+# Einzeltäter rauslöschen
+
+ego7_2 <- delete.vertices(ego7, degree(ego7)<=1)
+
+plot(ego7_2,
+     asp=0,
+     vertex.size=4,
+     layout = layout_nicely(ego7_2))
+```
+
+Neuer Chunk damit man alle nebeneinander darstellen kann
+
+```{r, fig.height=9, fig.width=16}
+
+# Idee: hier noch mal in die einzelnen Abschnitt unterteilen für Übersichtlichkeit
+par(mfrow=c(2,3),mar=c(1,1,1,1))
+
+#bspw für 1990 bis 1994 also RRyear1
+
+ego7year1 <- make_ego_graph(RRyear1, order = 2, nodes = V(RRFinal_u)$name == "Pressekodex Ziffer 7", mode="all")
+ego7year1 <- ego7year1[[1]]
+
+plot(ego7year1,
+     asp=0,
+     vertex.size=10,
+     main="Ego-Netzwerk Ziffer 7 - 1990 bis 1994")
+
+# warum nimmt er hier Ziffer 10?
+
+# 1995 bis 1999 also RRyear2
+
+
+ego7year2 <- make_ego_graph(RRyear2, order = 2, nodes = V(RRFinal_u)$name == "Pressekodex Ziffer 7", mode="all")
+ego7year2 <- ego7year2[[1]]
+
+plot(ego7year2,
+     asp=0,
+     vertex.size=2,
+     main="Ego-Netzwerk Ziffer 7 - 1995 bis 1999")
+
+# 2000 bis 2004 also RRyear3
+
+ego7year3 <- make_ego_graph(RRyear3, order = 2, nodes = V(RRFinal_u)$name == "Pressekodex Ziffer 7", mode="all")
+ego7year3 <- ego7year3[[1]]
+
+plot(ego7year3,
+     asp=0,
+     vertex.size=2,
+     main="Ego-Netzwerk Ziffer 7 - 2000 bis 2004")
+
+# 2005 bis 2009 also RRyear4
+
+ego7year4 <- make_ego_graph(RRyear4, order = 2, nodes = V(RRFinal_u)$name == "Pressekodex Ziffer 7", mode="all")
+ego7year4 <- ego7year4[[1]]
+
+plot(ego7year4,
+     asp=0,
+     vertex.size=2,
+     main="Ego-Netzwerk Ziffer 7 - 2005 bis 2009")
+
+# 2010 bis 2014 also RRyear5
+
+ego7year5 <- make_ego_graph(RRyear5, order = 2, nodes = V(RRFinal_u)$name == "Pressekodex Ziffer 7", mode="all")
+ego7year5 <- ego7year5[[1]]
+
+plot(ego7year5,
+     asp=0,
+     vertex.size=2,
+     main="Ego-Netzwerk Ziffer 7 - 2010 bis 2014")
+
+# 2015 bis 2019 also RRyear6
+
+ego7year6 <- make_ego_graph(RRyear6, order = 2, nodes = V(RRFinal_u)$name == "Pressekodex Ziffer 7", mode="all")
+ego7year6 <- ego7year6[[1]]
+
+plot(ego7year6,
+     asp=0,
+     vertex.size=2,
+     main="Ego-Netzwerk Ziffer 7 - 2015 bis 2019")
+```
+
+```{r, fig.height=9, fig.width=16}
+
+# Ziffer 2 als drittmeist gerügte Ziffer
+
+ego2 <- make_ego_graph(RRFinal_u, order = 2, nodes = V(RRFinal_u)$name == "Pressekodex Ziffer 2", mode="all")
+ego2 <- ego2[[1]]
+
+plot(ego2,
+     asp=0,
+     vertex.size=2,
+     main="Ego-Netzwerk1")
+
+# Einzeltäter rauslöschen
+
+ego2_2 <- delete.vertices(ego2, degree(ego2)<=1)
+
+plot(ego7_2,
+     asp=0,
+     vertex.size=4,
+     layout = layout_nicely(ego7_2))
+
+# Idee: hier noch mal in die einzelnen Abschnitt unterteilen für Übersichtlichkeit
+
+#bspw für 1990 bis 1994 also RRyear1
+
+ego2year1 <- make_ego_graph(RRyear1, order = 2, nodes = V(RRFinal_u)$name == "Pressekodex Ziffer 2", mode="all")
+ego2year1 <- ego2year1[[1]]
+
+plot(ego2year1,
+     asp=0,
+     vertex.size=2,
+     main="Ego-Netzwerk1")
+
+# 1995 bis 1999 also RRyear2
+
+ego2year2 <- make_ego_graph(RRyear2, order = 2, nodes = V(RRFinal_u)$name == "Pressekodex Ziffer 2", mode="all")
+ego2year2 <- ego2year2[[1]]
+
+plot(ego2year2,
+     asp=0,
+     vertex.size=2,
+     main="Ego-Netzwerk1")
+
+```
+
+```{r, fig.height=9, fig.width=16}
+
+# Ziffer 9 weil vermeintlich oft mit 8 gekoppelt
+
+ego9 <- make_ego_graph(RRFinal_u, order = 2, nodes = V(RRFinal_u)$name == "Pressekodex Ziffer 9", mode="all")
+ego9 <- ego9[[1]]
+
+plot(ego9,
+     asp=0,
+     vertex.size=2,
+     main="Ego-Netzwerk1")
+
+# Einzeltäter rauslöschen
+
+ego9_2 <- delete.vertices(ego9, degree(ego9)<=1)
+
+plot(ego9_2,
+     asp=0,
+     vertex.size=4,
+     layout = layout_nicely(ego7_2))
+
+# her eventuell clustern?
+
+# Idee: hier noch mal in die einzelnen Abschnitt unterteilen für Übersichtlichkeit
+
+#bspw für 1990 bis 1994 also RRyear1
+
+ego9year1 <- make_ego_graph(RRyear1, order = 2, nodes = V(RRFinal_u)$name == "Pressekodex Ziffer 9", mode="all")
+ego9year1 <- ego9year1[[1]]
+
+plot(ego9year1,
+     asp=0,
+     vertex.size=2,
+     main="Ego-Netzwerk1")
+
+# 1995 bis 1999 also RRyear2
+
+ego9year2 <- make_ego_graph(RRyear2, order = 2, nodes = V(RRFinal_u)$name == "Pressekodex Ziffer 9", mode="all")
+ego9year2 <- ego9year2[[1]]
+
+plot(ego9year2,
+     asp=0,
+     vertex.size=2,
+     main="Ego-Netzwerk1")
+
+```
+
+## Der größte Übeltäter: Die Bild (NOCH NICHT IMPLEMENTIERT)
+Um den größten Übeltäter heraus zu finden, haben wir die Degree-Werte des Gesamtnetzwerks anzeigen lassen. Aus den Ergebnissen sticht die Bild mit 168 Verbindungen heraus. Daher haben wir uns für ein Egonetzwerk der Bild entschieden. Hier stellt sich ganz klar heraus, dass die Bild am meisten gegen Ziffer 8 verstoßen hat. Gegen Ziffer 6 hingegen nur ein Mal. Mit der Ziffer 7 ist die Bild zwei Mal verbunden, was uns verwundert hat. Da die Ziffer 7 die zweitmeist gerügte Ziffer ist und die Bild der “größte Übeltäter”. Hier sieht man die Degreewerte des Ego-Netzwerks und die Ziffer, gegen welche die Bild am häufigsten verstoßen hat.
+
+
+```{r Ego Netzwerk und Degrees der Bild, fig.height=9, fig.width=16}
+
+# Degree-Werte des Gesamtnetzwerks anzeigen lassen
+
+sort.default(degreeRR, decreasing = TRUE)
+
+# Ego-Netzwerk der Bild bilden
+
+egoB <- make_ego_graph(RRFinal_u, order = 1, nodes = V(RRFinal_u)$name == "Bild", mode="all")
+egozB <- egoB[[1]]
+
+centr_degree(egozB, mode="all", normalized=T)
+indsB <- degree(egozB, mode="out")
+
+plot(egozB,
+     asp=0,
+     layout=layout_with_kk,
+     vertex.size=10,
+     main="Ego-Netzwerk Bild")
+
+# Degreewerte des Ego-Netzwerks berechnen und anzeigen lassen um zu sehen, gegen welche Ziffern die Bild am häufigsten verstoßen hat
+
+degreeB <- degree(egozB, mode="all")
+sort.default(degreeB, decreasing = TRUE)
+
+```
+
+\#\#Anzahl der Rügen pro Jahr (NOCH NICHT IMPLEMENTIERT)
+Im Jahr 2001 wurde am meisten gerügt, insgesamt 77 Mal. Zudem fällt auf, dass die Anzahl der Rügen nicht konstant ansteigen, sondern immer wieder zu- und abnehmen. Von 2000 bis 2003 ist der peak erreicht, dieses Jahr bildet den Höhepunkt. 
+Das Jahr 2000 war ein Rekordjahr für die Medienbranche. Im Jahr 2001 verbuchten die 100 größten Medienunternehmen im vergangenen Jahr ein Umsatzplus von knapp fünf Prozent im Vergleich zu 2000, wie das Fachmagazin “Horizont” berichtet.
+
+
+```{r Anzahl Edges/Rügen pro Jahr}
+# für jedes Jahr Ego-Netzwerk erstellen, um Anzahl der Rügen der jeweiligen Jahre zu sehen
+j1 <- delete.edges(RRFinal_u, E(RRFinal_u)[year > 1990])
+j1
+
+j2 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <1991])
+j2a <- delete.edges(j2, E(j2)[year >"1991"])
+j2a
+
+j3 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <1992])
+j3a <- delete.edges(j3, E(j3)[year >"1992"])
+j3a
+
+j4 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <1993])
+j4a <- delete.edges(j4, E(j4)[year >"1993"])
+j4a
+
+j5 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <1994])
+j5a <- delete.edges(j5, E(j5)[year >"1994"])
+j5a
+
+j6 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <1995])
+j6a <- delete.edges(j6, E(j6)[year >"1995"])
+j6a
+
+
+j7 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <1996])
+j7a <- delete.edges(j7, E(j7)[year >"1996"])
+j7a
+
+j8 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <1997])
+j8a <- delete.edges(j8, E(j8)[year >"1997"])
+j8a
+
+j9 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <1998])
+j9a <- delete.edges(j9, E(j9)[year >"1998"])
+j9a
+
+j10 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <1999])
+j10a <- delete.edges(j10, E(j10)[year >"1999"])
+j10a
+
+j11 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <2000])
+j11a <- delete.edges(j11, E(j11)[year >"2000"])
+j11a
+
+j12 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <2001])
+j12a <- delete.edges(j12, E(j12)[year >"2001"])
+j12a
+
+j13 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <2002])
+j13a <- delete.edges(j13, E(j13)[year >"2002"])
+j13a
+
+j14 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <2003])
+j14a <- delete.edges(j14, E(j14)[year >"2003"])
+j14a
+
+j15 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <2004])
+j15a <- delete.edges(j15, E(j15)[year >"2004"])
+j15a
+
+j16 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <2005])
+j16a <- delete.edges(j16, E(j16)[year >"2005"])
+j16a
+
+j17 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <2006])
+j17a <- delete.edges(j17, E(j17)[year >"2006"])
+j17a
+
+j18 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <2007])
+j18a <- delete.edges(j18, E(j18)[year >"2007"])
+j18a
+
+j19 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <2008])
+j19a <- delete.edges(j19, E(j19)[year >"2008"])
+j19a
+
+j20 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <2009])
+j20a <- delete.edges(j20, E(j20)[year >"2009"])
+j20a
+
+j21 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <2010])
+j21a <- delete.edges(j21, E(j21)[year >"2010"])
+j21a
+
+j22 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <2011])
+j22a <- delete.edges(j22, E(j22)[year >"2011"])
+j22a
+
+j23 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <2012])
+j23a <- delete.edges(j23, E(j23)[year >"2012"])
+j23a
+
+j24 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <2013])
+j24a <- delete.edges(j24, E(j24)[year >"2013"])
+j24a
+
+j25 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <2014])
+j25a <- delete.edges(j25, E(j25)[year >"2014"])
+j25a
+
+j26 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <2015])
+j26a <- delete.edges(j26, E(j26)[year >"2015"])
+j26a
+
+j27 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <2016])
+j27a <- delete.edges(j27, E(j27)[year >"2016"])
+j27a
+
+j28 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <2017])
+j28a <- delete.edges(j28, E(j28)[year >"2017"])
+j28a
+
+j29 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <2018])
+j29a <- delete.edges(j29, E(j29)[year >"2018"])
+j29a
+
+j30 <- delete.edges(RRFinal_u, E(RRFinal_u)[year <2019])
+j30
+```
+
+## Weitere Arbeit: Ab jetzt ohne Bild (NOCH NICHT IMPLEMENTIERT)
+Um den Fokus auf andere Übeltäter als die Bild zu setzen, haben wir alle Bild-Knoten aus dem Gesamtnetzwerk gelöscht. Auf Platz zwei und drei des Rügen Rankings folgen mit 23 Verstößen gegen den Pressekodex und Coupé und mit 21 Verstößen B.Z. 
+
+
+```{r Finales Netzwerk ohne Bild-Knoten, fig.height=9, fig.width=16}
+
+# Alle Bild-Nodes rauslöschen
+
+RRFinal_B <- graph_from_data_frame(d=edgematrix, vertices=nodesfinal, directed=FALSE) - vertices("Bild", 
+                                                                                          "Bild Online",
+                                                                                          "Bild Aachen",
+                                                                                          "Bild am Sonntag",
+                                                                                          "Bild Berlin",
+                                                                                          "Bild Bremen",
+                                                                                          "Bild Dresden",
+                                                                                          "Bild.de",
+                                                                                          "Bild Frankfurt",
+                                                                                          "Bild Hannover",
+                                                                                          "Bild Hamburg",
+                                                                                          "Bild Köln",
+                                                                                          "Bild München",
+                                                                                          "Bild Mainz Wiesbaden",
+                                                                                          "Bild Nürnberg",
+                                                                                          "Bild Rhein-Neckar",
+                                                                                          "Bild Stuttgart",
+                                                                                          "Bild + Online",
+                                                                                          "Auto Bild")
+
+# Degreewerte berechnen und anzeigen lassen
+
+degreeoB <- degree(RRFinal_B, mode="all")
+sort.default(degreeoB, decreasing = TRUE)
+```
+
+```{r Zeitverlauf online und offline}
+#Gleichzeitige Darstellung
+
+par(mfrow=c(2,3),mar=c(1,1,1,1))
+
+# Bereich 1990 - 1994 jeweils online (0) in grün, offline in türkis (1) und Ziffern in grau (3) 
+
+V(RRyear1)[V(RRyear1)$published==3]$color <- "grey80"
+V(RRyear1)[V(RRyear1)$published==0]$color <- "mediumseagreen"
+V(RRyear1)[V(RRyear1)$published==1]$color <- "mediumaquamarine"
+
+plot(RRyear1,
+    layout=layout_nicely,
+     edge.curved=.2,
+     edge.curved=curve_multiple(RRyear1),
+     main="Zeitraum 1990 - 1994") 
+
+# Bereich 1995 - 1999
+
+V(RRyear2)[V(RRyear2)$published==3]$color <- "grey80"
+V(RRyear2)[V(RRyear2)$published==0]$color <- "mediumseagreen"
+V(RRyear2)[V(RRyear2)$published==1]$color <- "mediumaquamarine"
+
+plot(RRyear2,
+    layout=layout_nicely,
+     edge.curved=.2,
+     edge.curved=curve_multiple(RRyear2),
+     main="Zeitraum 1995 - 1999") 
+
+# Bereich 2000 - 2004
+
+V(RRyear3)[V(RRyear3)$published==3]$color <- "grey80"
+V(RRyear3)[V(RRyear3)$published==0]$color <- "mediumseagreen"
+V(RRyear3)[V(RRyear3)$published==1]$color <- "mediumaquamarine"
+
+plot(RRyear3,
+    layout=layout_nicely,
+     edge.curved=.2,
+     edge.curved=curve_multiple(RRyear3),
+     main="Zeitraum 2000 - 2004") 
+
+# Bereich 2005 - 2009
+
+V(RRyear4)[V(RRyear4)$published==3]$color <- "grey80"
+V(RRyear4)[V(RRyear4)$published==0]$color <- "mediumseagreen"
+V(RRyear4)[V(RRyear4)$published==1]$color <- "mediumaquamarine"
+
+plot(RRyear4,
+    layout=layout_nicely,
+     edge.curved=.2,
+     edge.curved=curve_multiple(RRyear4),
+     main="Zeitraum 2005 - 2009") 
+
+# Bereich 2010 - 2014
+
+V(RRyear5)[V(RRyear5)$published==3]$color <- "grey80"
+V(RRyear5)[V(RRyear5)$published==0]$color <- "mediumseagreen"
+V(RRyear5)[V(RRyear5)$published==1]$color <- "mediumaquamarine"
+
+plot(RRyear5,
+    layout=layout_nicely,
+     edge.curved=.2,
+     edge.curved=curve_multiple(RRyear5),
+     main="Zeitraum 2010 - 2014") 
+
+# Bereich 2015 - 2019
+
+V(RRyear6)[V(RRyear6)$published==3]$color <- "grey80"
+V(RRyear6)[V(RRyear6)$published==0]$color <- "mediumseagreen"
+V(RRyear6)[V(RRyear6)$published==1]$color <- "mediumaquamarine"
+
+plot(RRyear6,
+    layout=layout_nicely,
+     edge.curved=.2,
+     edge.curved=curve_multiple(RRyear6),
+     main="Zeitraum 2015 - 2019") 
+
+```
+```{r Zeitverlauf regional und überregional}
+#Gleichzeitige Darstellung
+
+par(mfrow=c(2,3),mar=c(1,1,1,1))
+
+# Bereich 1990 - 1994 jeweils überregional (0) in grün, regional in türkis (1) und Ziffern in grau (3) 
+
+V(RRyear1)[V(RRyear1)$region==3]$color <- "grey80"
+V(RRyear1)[V(RRyear1)$region==0]$color <- "mediumseagreen"
+V(RRyear1)[V(RRyear1)$region==1]$color <- "mediumaquamarine"
+
+plot(RRyear1,
+    layout=layout_nicely,
+     edge.curved=.2,
+     edge.curved=curve_multiple(RRyear1),
+     main="Zeitraum 1990 - 1994") 
+
+# Bereich 1995 - 1999
+
+V(RRyear2)[V(RRyear2)$region==3]$color <- "grey80"
+V(RRyear2)[V(RRyear2)$region==0]$color <- "mediumseagreen"
+V(RRyear2)[V(RRyear2)$region==1]$color <- "mediumaquamarine"
+
+plot(RRyear2,
+    layout=layout_nicely,
+     edge.curved=.2,
+     edge.curved=curve_multiple(RRyear2),
+     main="Zeitraum 1995 - 1999") 
+
+# Bereich 2000 - 2004
+
+V(RRyear3)[V(RRyear3)$region==3]$color <- "grey80"
+V(RRyear3)[V(RRyear3)$region==0]$color <- "mediumseagreen"
+V(RRyear3)[V(RRyear3)$region==1]$color <- "mediumaquamarine"
+
+plot(RRyear3,
+    layout=layout_nicely,
+     edge.curved=.2,
+     edge.curved=curve_multiple(RRyear3),
+     main="Zeitraum 2000 - 2004") 
+
+# Bereich 2005 - 2009
+
+V(RRyear4)[V(RRyear4)$region==3]$color <- "grey80"
+V(RRyear4)[V(RRyear4)$region==0]$color <- "mediumseagreen"
+V(RRyear4)[V(RRyear4)$region==1]$color <- "mediumaquamarine"
+
+plot(RRyear4,
+    layout=layout_nicely,
+     edge.curved=.2,
+     edge.curved=curve_multiple(RRyear4),
+     main="Zeitraum 2005 - 2009") 
+
+# Bereich 2010 - 2014
+
+V(RRyear5)[V(RRyear5)$region==3]$color <- "grey80"
+V(RRyear5)[V(RRyear5)$region==0]$color <- "mediumseagreen"
+V(RRyear5)[V(RRyear5)$region==1]$color <- "mediumaquamarine"
+
+plot(RRyear5,
+    layout=layout_nicely,
+     edge.curved=.2,
+     edge.curved=curve_multiple(RRyear5),
+     main="Zeitraum 2010 - 2014") 
+
+# Bereich 2015 - 2019
+
+V(RRyear6)[V(RRyear6)$region==3]$color <- "grey80"
+V(RRyear6)[V(RRyear6)$region==0]$color <- "mediumseagreen"
+V(RRyear6)[V(RRyear6)$region==1]$color <- "mediumaquamarine"
+
+plot(RRyear6,
+    layout=layout_nicely,
+     edge.curved=.2,
+     edge.curved=curve_multiple(RRyear6),
+     main="Zeitraum 2015 - 2019") 
+
+```
+
+```{r}
+#es fehlt: Netzwerk ohne die Bild bei Mehrfachtäter-Egonetzwerk
+#manche edges werden bei ego-eins nicht angezeigt?
+#bei Datenerhebung statt NA bei Ziffer eine drei, weil visualisierung sonst nciht will 
+```
+## Sonstiges
+```{r Ego Netzwerk und Degrees Coupé, fig.height=9, fig.width=16}
+
+# Degree-Werte des Gesamtnetzwerks anzeigen lassen
+
+sort.default(degreeRR, decreasing = TRUE)
+
+# Ego-Netzwerk von Coupé bilden
+
+egoC <- make_ego_graph(RRFinal_u, order = 1, nodes = V(RRFinal_u)$name == "Coupé", mode="all")
+egoC <- egoC[[1]]
+
+centr_degree(egoC, mode="all", normalized=T)
+indsC <- degree(egoC, mode="out")
+
+plot(egoC,
+     asp=0,
+     layout=layout_with_kk,
+     vertex.size=10,
+     main="Ego-Netzwerk Coupé")
+
+# Degreewerte des Ego-Netzwerks berechnen und anzeigen lassen um zu sehen, gegen welche Ziffern die Coupé am häufigsten verstoßen hat
+
+degreeC <- degree(egoC, mode="all")
+sort.default(degreeC, decreasing = TRUE)
+
+```
+```{r Vergleich Bild und Coupé, fig.height=9, fig.width=16}
+
+par(mfrow=c(1,2),mar=c(1,1,1,1))
+
+plot(egozB,
+     asp=0,
+     layout=layout_with_kk,
+     vertex.size=10,
+     main="Ego-Netzwerk Bild")
+
+plot(egoC,
+     asp=0,
+     layout=layout_with_kk,
+     vertex.size=10,
+     main="Ego-Netzwerk Coupé")
+
+
+```
+```{r Vergleich Bild, Bild Online und Coupé, fig.height=9, fig.width=16}
+
+# Ego-Netzwerk von Bild Online bilden
+
+egoBO <- make_ego_graph(RRFinal_u, order = 1, nodes = V(RRFinal_u)$name == "Bild Online", mode="all")
+egoBO <- egoBO[[1]]
+
+centr_degree(egoBO, mode="all", normalized=T)
+indsBO <- degree(egoBO, mode="out")
+
+par(mfrow=c(1,3),mar=c(1,1,1,1))
+
+plot(egozB,
+     asp=0,
+     layout=layout_with_kk,
+     vertex.size=10,
+     main="Ego-Netzwerk Bild")
+
+plot(egoBO,
+     asp=0,
+     layout=layout_with_kk,
+     vertex.size=10,
+     main="Ego-Netzwerk Bild Online")
+
+plot(egoC,
+     asp=0,
+     layout=layout_with_kk,
+     vertex.size=10,
+     main="Ego-Netzwerk Coupé")
+
+
+```
+```{Noch nicht benutztes Zeug, eval=FALSE, include=FALSE}
+
+# Cluster-Darstellung Gesamtnetzwerk
+
+##RRFinal_c <- cluster_walktrap(RRFinal_u)
+##modularity(RRFinal_c)
+##membership(RRFinal_c)
+##plot(RRFinal_c, RRFinal_u,
+     ##layout=layout_nicely)
+
+# Größe der Nodes nach Indegree-Werten
+
+##centr_degree(RRyear3, mode="in", normalized=T)
+##inds3 <- degree(RRyear3, mode="in")
+
+```
